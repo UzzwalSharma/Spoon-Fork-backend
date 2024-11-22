@@ -4,11 +4,25 @@ import cors from 'cors'; // Import cors package
 
 const app = express();
 
-// Use CORS middleware
-app.use(cors({
-  origin: 'https://spoon-and-fork.vercel.app', // Replace with your frontend's URL
-}));
+// List of allowed origins
+const allowedOrigins = [
+  'http://localhost:5173', // For local development
+  'https://spoon-and-fork.vercel.app', // For production
+];
 
+// Use CORS middleware
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or Postman)
+      if (!origin) return callback(null, true);
+      if (!allowedOrigins.includes(origin)) {
+        return callback(new Error('Not allowed by CORS'), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 
 const PORT = 5000;
 
